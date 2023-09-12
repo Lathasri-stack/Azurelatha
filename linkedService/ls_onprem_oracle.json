@@ -1,0 +1,16 @@
+{
+	"name": "ls_onprem_oracle",
+	"type": "Microsoft.DataFactory/factories/linkedservices",
+	"properties": {
+		"annotations": [],
+		"type": "Oracle",
+		"typeProperties": {
+			"connectionString": "host=LAPTOP-SDT0MGUU;port=1521;sid=XE;user id=SYSTEM",
+			"encryptedCredential": "eyJDcmVkZW50aWFsSWQiOiJkNzA4MDNjYi01NGU2LTRhNjItOGQwNy0xZDhlMmI0ZWFhYTQiLCJWZXJzaW9uIjoiMi4wIiwiQ2xhc3NUeXBlIjoiTWljcm9zb2Z0LkRhdGFQcm94eS5Db3JlLkludGVyU2VydmljZURhdGFDb250cmFjdC5DcmVkZW50aWFsU1UwNkNZMTQifQ=="
+		},
+		"connectVia": {
+			"referenceName": "integrationRuntime3",
+			"type": "IntegrationRuntimeReference"
+		}
+	}
+}
