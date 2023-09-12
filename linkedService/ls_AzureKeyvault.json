@@ -1,0 +1,10 @@
+{
+	"name": "ls_AzureKeyvault",
+	"properties": {
+		"annotations": [],
+		"type": "AzureKeyVault",
+		"typeProperties": {
+			"baseUrl": "https://storepass.vault.azure.net/"
+		}
+	}
+}
