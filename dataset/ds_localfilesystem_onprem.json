@@ -1,0 +1,17 @@
+{
+	"name": "ds_localfilesystem_onprem",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "ls_localfilesystem_onprem",
+			"type": "LinkedServiceReference"
+		},
+		"annotations": [],
+		"type": "Binary",
+		"typeProperties": {
+			"location": {
+				"type": "FileServerLocation",
+				"folderPath": "SH"
+			}
+		}
+	}
+}
