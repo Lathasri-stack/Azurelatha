@@ -1,0 +1,9 @@
+{
+	"name": "adfLathasribatch37",
+	"location": "eastus",
+	"identity": {
+		"type": "SystemAssigned",
+		"principalId": "860e130c-5434-4456-8433-f4653b386f08",
+		"tenantId": "db2b7ce8-69ea-4c5d-a5cd-dd55740e025f"
+	}
+}
