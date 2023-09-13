@@ -34,6 +34,7 @@
 					],
 					"storeSettings": {
 						"type": "FileServerReadSettings",
+						"recursive": true,
 						"enablePartitionDiscovery": false
 					},
 					"formatSettings": {
@@ -170,7 +171,7 @@
 				},
 				"userProperties": [],
 				"typeProperties": {
-					"notebookPath": "/Shared/Pyspark_Project_Dynamic (3)/NB_sales_landing_staging",
+					"notebookPath": "/Shared/Pyspark_Project_Dynamic/NB_sales_landing_staging",
 					"baseParameters": {
 						"job_id": {
 							"value": "@pipeline().parameters.job_id",
@@ -255,7 +256,7 @@
 				},
 				"userProperties": [],
 				"typeProperties": {
-					"notebookPath": "/Shared/Pyspark_Project_Dynamic (3)/NB_sales_staging_curated",
+					"notebookPath": "/Shared/Pyspark_Project_Dynamic/NB_sales_staging_curated",
 					"baseParameters": {
 						"job_id": {
 							"value": "@pipeline().parameters.job_id",
@@ -347,7 +348,7 @@
 							},
 							"userProperties": [],
 							"typeProperties": {
-								"notebookPath": "/Shared/Pyspark_Project_Dynamic (3)/NB_sales_curation_dwh",
+								"notebookPath": "/Shared/Pyspark_Project_Dynamic/NB_sales_curation_dwh",
 								"baseParameters": {
 									"job_id": {
 										"value": "@pipeline().parameters.job_id",
@@ -425,7 +426,7 @@
 									},
 									"userProperties": [],
 									"typeProperties": {
-										"notebookPath": "/Shared/Pyspark_Project_Dynamic (3)/NB_sales_fact_load",
+										"notebookPath": "/Shared/Pyspark_Project_Dynamic/NB_sales_fact_load",
 										"baseParameters": {
 											"job_id": {
 												"value": "@pipeline().parameters.job_id",
@@ -500,7 +501,7 @@
 									},
 									"userProperties": [],
 									"typeProperties": {
-										"notebookPath": "/Shared/Pyspark_Project_Dynamic (3)/NB_costs_fact_load",
+										"notebookPath": "/Shared/Pyspark_Project_Dynamic/NB_costs_fact_load",
 										"baseParameters": {
 											"job_id": {
 												"value": "@pipeline().parameters.job_id",
