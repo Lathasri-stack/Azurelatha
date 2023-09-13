@@ -5,12 +5,20 @@
 			"referenceName": "ls_localfilesystem_onprem",
 			"type": "LinkedServiceReference"
 		},
+		"parameters": {
+			"folder_name": {
+				"type": "string"
+			}
+		},
 		"annotations": [],
 		"type": "Binary",
 		"typeProperties": {
 			"location": {
 				"type": "FileServerLocation",
-				"folderPath": "SH"
+				"folderPath": {
+					"value": "@concat('SH/',dataset().folder_name)",
+					"type": "Expression"
+				}
 			}
 		}
 	}
