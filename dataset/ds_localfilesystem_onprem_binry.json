@@ -1,12 +1,15 @@
 {
-	"name": "ds_localfilesystem_onprem",
+	"name": "ds_localfilesystem_onprem_binry",
 	"properties": {
 		"linkedServiceName": {
 			"referenceName": "ls_localfilesystem_onprem",
 			"type": "LinkedServiceReference"
 		},
 		"parameters": {
-			"folder_name": {
+			"source_folder": {
+				"type": "string"
+			},
+			"source_file": {
 				"type": "string"
 			}
 		},
@@ -15,8 +18,12 @@
 		"typeProperties": {
 			"location": {
 				"type": "FileServerLocation",
+				"fileName": {
+					"value": "@dataset().source_file",
+					"type": "Expression"
+				},
 				"folderPath": {
-					"value": "@concat('SH/',dataset().folder_name)",
+					"value": "@concat('SH/',dataset().source_folder)",
 					"type": "Expression"
 				}
 			}

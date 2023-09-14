@@ -1,0 +1,33 @@
+{
+	"name": "ds_slaes_adlsgen2_binary",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "AzureDataLakeStorage1",
+			"type": "LinkedServiceReference"
+		},
+		"parameters": {
+			"target_folder": {
+				"type": "string"
+			},
+			"target_file": {
+				"type": "string"
+			}
+		},
+		"annotations": [],
+		"type": "Binary",
+		"typeProperties": {
+			"location": {
+				"type": "AzureBlobFSLocation",
+				"fileName": {
+					"value": "@dataset().target_file",
+					"type": "Expression"
+				},
+				"folderPath": {
+					"value": "@concat('landing/',dataset().target_folder)",
+					"type": "Expression"
+				},
+				"fileSystem": "datalake"
+			}
+		}
+	}
+}

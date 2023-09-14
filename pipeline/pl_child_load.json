@@ -1,0 +1,641 @@
+{
+	"name": "pl_child_load",
+	"properties": {
+		"activities": [
+			{
+				"name": "GetMetadata",
+				"type": "GetMetadata",
+				"dependsOn": [],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"dataset": {
+						"referenceName": "ds_localfilesystem_onprem",
+						"type": "DatasetReference",
+						"parameters": {
+							"folder_name": {
+								"value": "@pipeline().parameters.landing_zone_folder_name",
+								"type": "Expression"
+							}
+						}
+					},
+					"fieldList": [
+						"childItems",
+						"created",
+						"exists",
+						"itemName",
+						"lastModified"
+					],
+					"storeSettings": {
+						"type": "FileServerReadSettings",
+						"recursive": true,
+						"enablePartitionDiscovery": false
+					},
+					"formatSettings": {
+						"type": "BinaryReadSettings"
+					}
+				}
+			},
+			{
+				"name": "Filter1",
+				"type": "Filter",
+				"dependsOn": [
+					{
+						"activity": "GetMetadata",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"userProperties": [],
+				"typeProperties": {
+					"items": {
+						"value": "@activity('GetMetadata').output.childItems",
+						"type": "Expression"
+					},
+					"condition": {
+						"value": "@equals(item().type,'File')",
+						"type": "Expression"
+					}
+				}
+			},
+			{
+				"name": "ForEach1",
+				"type": "ForEach",
+				"dependsOn": [
+					{
+						"activity": "Filter1",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"userProperties": [],
+				"typeProperties": {
+					"items": {
+						"value": "@activity('Filter1').output.value",
+						"type": "Expression"
+					},
+					"activities": [
+						{
+							"name": "OnpremToAdlsgen2",
+							"type": "Copy",
+							"dependsOn": [],
+							"policy": {
+								"timeout": "0.12:00:00",
+								"retry": 0,
+								"retryIntervalInSeconds": 30,
+								"secureOutput": false,
+								"secureInput": false
+							},
+							"userProperties": [],
+							"typeProperties": {
+								"source": {
+									"type": "BinarySource",
+									"storeSettings": {
+										"type": "FileServerReadSettings",
+										"recursive": false,
+										"deleteFilesAfterCompletion": false
+									},
+									"formatSettings": {
+										"type": "BinaryReadSettings"
+									}
+								},
+								"sink": {
+									"type": "BinarySink",
+									"storeSettings": {
+										"type": "AzureBlobFSWriteSettings"
+									}
+								},
+								"enableStaging": false
+							},
+							"inputs": [
+								{
+									"referenceName": "ds_localfilesystem_onprem_binry",
+									"type": "DatasetReference",
+									"parameters": {
+										"source_folder": {
+											"value": "@pipeline().parameters.landing_zone_folder_name",
+											"type": "Expression"
+										},
+										"source_file": {
+											"value": "@item().name",
+											"type": "Expression"
+										}
+									}
+								}
+							],
+							"outputs": [
+								{
+									"referenceName": "ds_slaes_adlsgen2_binary",
+									"type": "DatasetReference",
+									"parameters": {
+										"target_folder": {
+											"value": "@pipeline().parameters.landing_zone_folder_name",
+											"type": "Expression"
+										},
+										"target_file": {
+											"value": "@item().name",
+											"type": "Expression"
+										}
+									}
+								}
+							]
+						}
+					]
+				}
+			},
+			{
+				"name": "landingtobronze",
+				"type": "DatabricksNotebook",
+				"dependsOn": [
+					{
+						"activity": "ForEach1",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"notebookPath": "/Shared/Pyspark_Project_Dynamic/NB_sales_landing_staging",
+					"baseParameters": {
+						"job_id": {
+							"value": "@pipeline().parameters.job_id",
+							"type": "Expression"
+						},
+						"job_name": {
+							"value": "@pipeline().parameters.job_name",
+							"type": "Expression"
+						},
+						"landing_zone_file_path": {
+							"value": "@pipeline().parameters.landing_zone_file_path",
+							"type": "Expression"
+						},
+						"landing_zone_folder_name": {
+							"value": "@pipeline().parameters.landing_zone_folder_name",
+							"type": "Expression"
+						},
+						"landing_zone_file_name": {
+							"value": "@pipeline().parameters.landing_zone_file_name",
+							"type": "Expression"
+						},
+						"landing_zone_file_type": {
+							"value": "@pipeline().parameters.landing_zone_file_type",
+							"type": "Expression"
+						},
+						"staging_zone_database_name": {
+							"value": "@pipeline().parameters.staging_zone_database_name",
+							"type": "Expression"
+						},
+						"staging_zone_table_name": {
+							"value": "@pipeline().parameters.staging_zone_table_name",
+							"type": "Expression"
+						},
+						"staging_zone_table_pk_column": {
+							"value": "@pipeline().parameters.staging_zone_table_pk_column",
+							"type": "Expression"
+						},
+						"pyspark_schema": {
+							"value": "@pipeline().parameters.pyspark_schema",
+							"type": "Expression"
+						}
+					}
+				},
+				"linkedServiceName": {
+					"referenceName": "ls_databricks",
+					"type": "LinkedServiceReference"
+				}
+			},
+			{
+				"name": "Wait1",
+				"type": "Wait",
+				"dependsOn": [
+					{
+						"activity": "landingtobronze",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"userProperties": [],
+				"typeProperties": {
+					"waitTimeInSeconds": 20
+				}
+			},
+			{
+				"name": "BronzetoSilver",
+				"type": "DatabricksNotebook",
+				"dependsOn": [
+					{
+						"activity": "Wait1",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"notebookPath": "/Shared/Pyspark_Project_Dynamic/NB_sales_staging_curated",
+					"baseParameters": {
+						"job_id": {
+							"value": "@pipeline().parameters.job_id",
+							"type": "Expression"
+						},
+						"job_name": {
+							"value": "@pipeline().parameters.job_name",
+							"type": "Expression"
+						},
+						"staging_zone_database_name": {
+							"value": "@pipeline().parameters.staging_zone_database_name",
+							"type": "Expression"
+						},
+						"staging_zone_table_name": {
+							"value": "@pipeline().parameters.staging_zone_table_name",
+							"type": "Expression"
+						},
+						"staging_zone_table_pk_column": {
+							"value": "@pipeline().parameters.staging_zone_table_pk_column",
+							"type": "Expression"
+						},
+						"pyspark_schema": {
+							"value": "@pipeline().parameters.pyspark_schema",
+							"type": "Expression"
+						},
+						"curation_zone_database_name": {
+							"value": "@pipeline().parameters.curation_zone_database_name",
+							"type": "Expression"
+						},
+						"curation_zone_table_name": {
+							"value": "@pipeline().parameters.curation_zone_table_name",
+							"type": "Expression"
+						},
+						"curation_zone_table_pk_column": {
+							"value": "@pipeline().parameters.curation_zone_table_pk_column",
+							"type": "Expression"
+						}
+					}
+				},
+				"linkedServiceName": {
+					"referenceName": "ls_databricks",
+					"type": "LinkedServiceReference"
+				}
+			},
+			{
+				"name": "Wait2",
+				"type": "Wait",
+				"dependsOn": [
+					{
+						"activity": "BronzetoSilver",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"userProperties": [],
+				"typeProperties": {
+					"waitTimeInSeconds": 20
+				}
+			},
+			{
+				"name": "If Condition1",
+				"type": "IfCondition",
+				"dependsOn": [
+					{
+						"activity": "Wait2",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"userProperties": [],
+				"typeProperties": {
+					"expression": {
+						"value": "@equals(pipeline().parameters.table_type,'dim')",
+						"type": "Expression"
+					},
+					"ifTrueActivities": [
+						{
+							"name": "SilverToGoldDim",
+							"type": "DatabricksNotebook",
+							"dependsOn": [],
+							"policy": {
+								"timeout": "0.12:00:00",
+								"retry": 0,
+								"retryIntervalInSeconds": 30,
+								"secureOutput": false,
+								"secureInput": false
+							},
+							"userProperties": [],
+							"typeProperties": {
+								"notebookPath": "/Shared/Pyspark_Project_Dynamic/NB_sales_curation_dwh",
+								"baseParameters": {
+									"job_id": {
+										"value": "@pipeline().parameters.job_id",
+										"type": "Expression"
+									},
+									"job_name": {
+										"value": "@pipeline().parameters.job_name",
+										"type": "Expression"
+									},
+									"dw_zone_database_name": {
+										"value": "@pipeline().parameters.dw_zone_database_name",
+										"type": "Expression"
+									},
+									"dw_zone_table_name": {
+										"value": "@pipeline().parameters.dw_zone_table_name",
+										"type": "Expression"
+									},
+									"dw_zone_table_pk_column": {
+										"value": "@pipeline().parameters.dw_zone_table_pk_column",
+										"type": "Expression"
+									},
+									"curation_zone_database_name": {
+										"value": "@pipeline().parameters.curation_zone_database_name",
+										"type": "Expression"
+									},
+									"curation_zone_table_name": {
+										"value": "@pipeline().parameters.curation_zone_table_name",
+										"type": "Expression"
+									},
+									"curation_zone_table_pk_column": {
+										"value": "@pipeline().parameters.curation_zone_table_pk_column",
+										"type": "Expression"
+									}
+								}
+							},
+							"linkedServiceName": {
+								"referenceName": "ls_databricks",
+								"type": "LinkedServiceReference"
+							}
+						}
+					]
+				}
+			},
+			{
+				"name": "Switch1",
+				"type": "Switch",
+				"dependsOn": [
+					{
+						"activity": "Wait3",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"userProperties": [],
+				"typeProperties": {
+					"on": {
+						"value": "@pipeline().parameters.job_name",
+						"type": "Expression"
+					},
+					"cases": [
+						{
+							"value": "sales_transaction",
+							"activities": [
+								{
+									"name": "SalesFact",
+									"type": "DatabricksNotebook",
+									"dependsOn": [],
+									"policy": {
+										"timeout": "0.12:00:00",
+										"retry": 0,
+										"retryIntervalInSeconds": 30,
+										"secureOutput": false,
+										"secureInput": false
+									},
+									"userProperties": [],
+									"typeProperties": {
+										"notebookPath": "/Shared/Pyspark_Project_Dynamic/NB_sales_fact_load",
+										"baseParameters": {
+											"job_id": {
+												"value": "@pipeline().parameters.job_id",
+												"type": "Expression"
+											},
+											"job_name": {
+												"value": "@pipeline().parameters.job_name",
+												"type": "Expression"
+											},
+											"staging_zone_database_name": {
+												"value": "@pipeline().parameters.staging_zone_database_name",
+												"type": "Expression"
+											},
+											"staging_zone_table_name": {
+												"value": "@pipeline().parameters.staging_zone_table_name",
+												"type": "Expression"
+											},
+											"staging_zone_table_pk_column": {
+												"value": "@pipeline().parameters.staging_zone_table_pk_column",
+												"type": "Expression"
+											},
+											"pyspark_schema": {
+												"value": "@pipeline().parameters.pyspark_schema",
+												"type": "Expression"
+											},
+											"curation_zone_database_name": {
+												"value": "@pipeline().parameters.curation_zone_database_name",
+												"type": "Expression"
+											},
+											"curation_zone_table_name": {
+												"value": "@pipeline().parameters.curation_zone_table_name",
+												"type": "Expression"
+											},
+											"curation_zone_table_pk_column": {
+												"value": "@pipeline().parameters.curation_zone_table_pk_column",
+												"type": "Expression"
+											},
+											"dw_zone_database_name": {
+												"value": "@pipeline().parameters.dw_zone_database_name",
+												"type": "Expression"
+											},
+											"dw_zone_table_name": {
+												"value": "@pipeline().parameters.dw_zone_table_name",
+												"type": "Expression"
+											},
+											"dw_zone_table_pk_column": {
+												"value": "@pipeline().parameters.dw_zone_table_pk_column",
+												"type": "Expression"
+											}
+										}
+									},
+									"linkedServiceName": {
+										"referenceName": "ls_databricks",
+										"type": "LinkedServiceReference"
+									}
+								}
+							]
+						},
+						{
+							"value": "costs_transaction",
+							"activities": [
+								{
+									"name": "CostsFact",
+									"type": "DatabricksNotebook",
+									"dependsOn": [],
+									"policy": {
+										"timeout": "0.12:00:00",
+										"retry": 0,
+										"retryIntervalInSeconds": 30,
+										"secureOutput": false,
+										"secureInput": false
+									},
+									"userProperties": [],
+									"typeProperties": {
+										"notebookPath": "/Shared/Pyspark_Project_Dynamic/NB_costs_fact_load",
+										"baseParameters": {
+											"job_id": {
+												"value": "@pipeline().parameters.job_id",
+												"type": "Expression"
+											},
+											"job_name": {
+												"value": "@pipeline().parameters.job_name",
+												"type": "Expression"
+											},
+											"staging_zone_database_name": {
+												"value": "@pipeline().parameters.staging_zone_database_name",
+												"type": "Expression"
+											},
+											"staging_zone_table_name": {
+												"value": "@pipeline().parameters.staging_zone_table_name",
+												"type": "Expression"
+											},
+											"staging_zone_table_pk_column": {
+												"value": "@pipeline().parameters.staging_zone_table_pk_column",
+												"type": "Expression"
+											},
+											"pyspark_schema": {
+												"value": "@pipeline().parameters.pyspark_schema",
+												"type": "Expression"
+											},
+											"curation_zone_database_name": {
+												"value": "@pipeline().parameters.curation_zone_database_name",
+												"type": "Expression"
+											},
+											"curation_zone_table_name": {
+												"value": "@pipeline().parameters.curation_zone_table_name",
+												"type": "Expression"
+											},
+											"curation_zone_table_pk_column": {
+												"value": "@pipeline().parameters.curation_zone_table_pk_column",
+												"type": "Expression"
+											},
+											"dw_zone_database_name": {
+												"value": "@pipeline().parameters.dw_zone_database_name",
+												"type": "Expression"
+											},
+											"dw_zone_table_name": {
+												"value": "@pipeline().parameters.dw_zone_table_name",
+												"type": "Expression"
+											},
+											"dw_zone_table_pk_column": {
+												"value": "@pipeline().parameters.dw_zone_table_pk_column",
+												"type": "Expression"
+											}
+										}
+									},
+									"linkedServiceName": {
+										"referenceName": "ls_databricks",
+										"type": "LinkedServiceReference"
+									}
+								}
+							]
+						}
+					]
+				}
+			},
+			{
+				"name": "Wait3",
+				"type": "Wait",
+				"dependsOn": [
+					{
+						"activity": "If Condition1",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"userProperties": [],
+				"typeProperties": {
+					"waitTimeInSeconds": 1
+				}
+			}
+		],
+		"parameters": {
+			"job_id": {
+				"type": "string"
+			},
+			"job_name": {
+				"type": "string"
+			},
+			"landing_zone_file_path": {
+				"type": "string"
+			},
+			"landing_zone_folder_name": {
+				"type": "string"
+			},
+			"landing_zone_file_name": {
+				"type": "string"
+			},
+			"landing_zone_file_type": {
+				"type": "string"
+			},
+			"staging_zone_database_name": {
+				"type": "string"
+			},
+			"staging_zone_table_name": {
+				"type": "string"
+			},
+			"staging_zone_table_pk_column": {
+				"type": "string"
+			},
+			"pyspark_schema": {
+				"type": "string"
+			},
+			"curation_zone_database_name": {
+				"type": "string"
+			},
+			"curation_zone_table_name": {
+				"type": "string"
+			},
+			"curation_zone_table_pk_column": {
+				"type": "string"
+			},
+			"dw_zone_database_name": {
+				"type": "string"
+			},
+			"dw_zone_table_name": {
+				"type": "string"
+			},
+			"dw_zone_table_pk_column": {
+				"type": "string"
+			},
+			"table_type": {
+				"type": "string"
+			}
+		},
+		"folder": {
+			"name": "Onpremtocloud"
+		},
+		"annotations": []
+	}
+}
