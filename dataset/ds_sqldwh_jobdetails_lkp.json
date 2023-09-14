@@ -1,0 +1,16 @@
+{
+	"name": "ds_sqldwh_jobdetails_lkp",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "ls_sqldwh",
+			"type": "LinkedServiceReference"
+		},
+		"annotations": [],
+		"type": "AzureSqlDWTable",
+		"schema": [],
+		"typeProperties": {
+			"schema": "DBO",
+			"table": "JOB_DETAILS"
+		}
+	}
+}
