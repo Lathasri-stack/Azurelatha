@@ -1,0 +1,25 @@
+{
+	"name": "ds_sqldwh_getmetadata_onprem",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "ls_localfilesystem_onprem",
+			"type": "LinkedServiceReference"
+		},
+		"parameters": {
+			"source_folder": {
+				"type": "string"
+			}
+		},
+		"annotations": [],
+		"type": "Binary",
+		"typeProperties": {
+			"location": {
+				"type": "FileServerLocation",
+				"folderPath": {
+					"value": "@concat('SH/',dataset().source_folder)",
+					"type": "Expression"
+				}
+			}
+		}
+	}
+}

@@ -3,12 +3,150 @@
 	"properties": {
 		"activities": [
 			{
-				"name": "Wait1",
-				"type": "Wait",
+				"name": "Get Metadata1",
+				"type": "GetMetadata",
 				"dependsOn": [],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
 				"userProperties": [],
 				"typeProperties": {
-					"waitTimeInSeconds": 1
+					"dataset": {
+						"referenceName": "ds_sqldwh_getmetadata_onprem",
+						"type": "DatasetReference",
+						"parameters": {
+							"source_folder": {
+								"value": "@pipeline().parameters.source_folder",
+								"type": "Expression"
+							}
+						}
+					},
+					"fieldList": [
+						"childItems",
+						"created",
+						"exists",
+						"itemName",
+						"lastModified"
+					],
+					"storeSettings": {
+						"type": "FileServerReadSettings",
+						"enablePartitionDiscovery": false
+					},
+					"formatSettings": {
+						"type": "BinaryReadSettings"
+					}
+				}
+			},
+			{
+				"name": "Filter1",
+				"type": "Filter",
+				"dependsOn": [
+					{
+						"activity": "Get Metadata1",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"userProperties": [],
+				"typeProperties": {
+					"items": {
+						"value": "@activity('Get Metadata1').output.childItems",
+						"type": "Expression"
+					},
+					"condition": {
+						"value": "@equals(item().Type,'File')",
+						"type": "Expression"
+					}
+				}
+			},
+			{
+				"name": "ForEach1",
+				"type": "ForEach",
+				"dependsOn": [
+					{
+						"activity": "Filter1",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"userProperties": [],
+				"typeProperties": {
+					"items": {
+						"value": "@activity('Filter1').output.value",
+						"type": "Expression"
+					},
+					"activities": [
+						{
+							"name": "Copy data1",
+							"type": "Copy",
+							"dependsOn": [],
+							"policy": {
+								"timeout": "0.12:00:00",
+								"retry": 0,
+								"retryIntervalInSeconds": 30,
+								"secureOutput": false,
+								"secureInput": false
+							},
+							"userProperties": [],
+							"typeProperties": {
+								"source": {
+									"type": "BinarySource",
+									"storeSettings": {
+										"type": "FileServerReadSettings",
+										"recursive": true
+									},
+									"formatSettings": {
+										"type": "BinaryReadSettings"
+									}
+								},
+								"sink": {
+									"type": "BinarySink",
+									"storeSettings": {
+										"type": "AzureBlobFSWriteSettings"
+									}
+								},
+								"enableStaging": false
+							},
+							"inputs": [
+								{
+									"referenceName": "ds_sqldwh_onprem_file_dynamic",
+									"type": "DatasetReference",
+									"parameters": {
+										"source_folder": {
+											"value": "@pipeline().parameters.source_folder",
+											"type": "Expression"
+										},
+										"source_file": {
+											"value": "@item().name",
+											"type": "Expression"
+										}
+									}
+								}
+							],
+							"outputs": [
+								{
+									"referenceName": "ds_sqldwh_adlsgen2_file_dynamic",
+									"type": "DatasetReference",
+									"parameters": {
+										"target_folder": {
+											"value": "@pipeline().parameters.target_table",
+											"type": "Expression"
+										},
+										"target_file": {
+											"value": "@item().name",
+											"type": "Expression"
+										}
+									}
+								}
+							]
+						}
+					]
 				}
 			}
 		],

@@ -1,0 +1,32 @@
+{
+	"name": "ds_sqldwh_onprem_file_dynamic",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "ls_localfilesystem_onprem",
+			"type": "LinkedServiceReference"
+		},
+		"parameters": {
+			"source_folder": {
+				"type": "string"
+			},
+			"source_file": {
+				"type": "string"
+			}
+		},
+		"annotations": [],
+		"type": "Binary",
+		"typeProperties": {
+			"location": {
+				"type": "FileServerLocation",
+				"fileName": {
+					"value": "@dataset().source_file",
+					"type": "Expression"
+				},
+				"folderPath": {
+					"value": "@concat('SH/',dataset().source_folder)",
+					"type": "Expression"
+				}
+			}
+		}
+	}
+}
