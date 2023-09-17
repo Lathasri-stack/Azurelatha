@@ -81,6 +81,7 @@
 						"value": "@activity('Filter1').output.value",
 						"type": "Expression"
 					},
+					"isSequential": false,
 					"activities": [
 						{
 							"name": "Copy data1",
@@ -135,7 +136,7 @@
 									"type": "DatasetReference",
 									"parameters": {
 										"target_folder": {
-											"value": "@pipeline().parameters.target_table",
+											"value": "@pipeline().parameters.source_folder",
 											"type": "Expression"
 										},
 										"target_file": {
@@ -189,6 +190,21 @@
 									"disableMetricsCollection": false
 								},
 								"enableStaging": false,
+								"enableSkipIncompatibleRow": true,
+								"validateDataConsistency": true,
+								"logSettings": {
+									"enableCopyActivityLog": true,
+									"copyActivityLogSettings": {
+										"logLevel": "Warning",
+										"enableReliableLogging": false
+									},
+									"logLocationSettings": {
+										"linkedServiceName": {
+											"referenceName": "AzureDataLakeStorage1",
+											"type": "LinkedServiceReference"
+										}
+									}
+								},
 								"translator": {
 									"type": "TabularTranslator",
 									"typeConversion": true,
