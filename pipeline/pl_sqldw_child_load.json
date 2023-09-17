@@ -145,6 +145,117 @@
 									}
 								}
 							]
+						},
+						{
+							"name": "Copy data1_copy1",
+							"type": "Copy",
+							"dependsOn": [
+								{
+									"activity": "Copy data1",
+									"dependencyConditions": [
+										"Succeeded"
+									]
+								}
+							],
+							"policy": {
+								"timeout": "0.12:00:00",
+								"retry": 0,
+								"retryIntervalInSeconds": 30,
+								"secureOutput": false,
+								"secureInput": false
+							},
+							"userProperties": [],
+							"typeProperties": {
+								"source": {
+									"type": "DelimitedTextSource",
+									"storeSettings": {
+										"type": "AzureBlobFSReadSettings",
+										"recursive": true,
+										"enablePartitionDiscovery": false
+									},
+									"formatSettings": {
+										"type": "DelimitedTextReadSettings"
+									}
+								},
+								"sink": {
+									"type": "SqlDWSink",
+									"preCopyScript": {
+										"value": "truncate table @{pipeline().parameters.stg_table}",
+										"type": "Expression"
+									},
+									"writeBehavior": "Insert",
+									"sqlWriterUseTableLock": false,
+									"tableOption": "autoCreate",
+									"disableMetricsCollection": false
+								},
+								"enableStaging": false,
+								"translator": {
+									"type": "TabularTranslator",
+									"typeConversion": true,
+									"typeConversionSettings": {
+										"allowDataTruncation": true,
+										"treatBooleanAsNumber": false
+									}
+								}
+							},
+							"inputs": [
+								{
+									"referenceName": "ds_sqldwh_adlsgen2_csv_dynamic",
+									"type": "DatasetReference",
+									"parameters": {
+										"source_folder": {
+											"value": "@pipeline().parameters.source_folder",
+											"type": "Expression"
+										},
+										"source_file": {
+											"value": "@item().name",
+											"type": "Expression"
+										}
+									}
+								}
+							],
+							"outputs": [
+								{
+									"referenceName": "ds_sqldwh_table_dynamic",
+									"type": "DatasetReference",
+									"parameters": {
+										"stg_table": {
+											"value": "@pipeline().parameters.stg_table",
+											"type": "Expression"
+										}
+									}
+								}
+							]
+						},
+						{
+							"name": "ProcName",
+							"type": "SqlServerStoredProcedure",
+							"dependsOn": [
+								{
+									"activity": "Copy data1_copy1",
+									"dependencyConditions": [
+										"Succeeded"
+									]
+								}
+							],
+							"policy": {
+								"timeout": "0.12:00:00",
+								"retry": 0,
+								"retryIntervalInSeconds": 30,
+								"secureOutput": false,
+								"secureInput": false
+							},
+							"userProperties": [],
+							"typeProperties": {
+								"storedProcedureName": {
+									"value": "@pipeline().parameters.proc_name",
+									"type": "Expression"
+								}
+							},
+							"linkedServiceName": {
+								"referenceName": "ls_sqldwh",
+								"type": "LinkedServiceReference"
+							}
 						}
 					]
 				}

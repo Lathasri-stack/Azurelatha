@@ -1,0 +1,27 @@
+{
+	"name": "ds_sqldwh_table_dynamic",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "ls_sqldwh",
+			"type": "LinkedServiceReference"
+		},
+		"parameters": {
+			"stg_table": {
+				"type": "string"
+			}
+		},
+		"annotations": [],
+		"type": "AzureSqlDWTable",
+		"schema": [],
+		"typeProperties": {
+			"schema": {
+				"value": "DBO",
+				"type": "Expression"
+			},
+			"table": {
+				"value": "@dataset().stg_table",
+				"type": "Expression"
+			}
+		}
+	}
+}
