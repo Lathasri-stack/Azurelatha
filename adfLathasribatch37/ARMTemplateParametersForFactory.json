@@ -1,0 +1,36 @@
+{
+	"$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentParameters.json#",
+	"contentVersion": "1.0.0.0",
+	"parameters": {
+		"factoryName": {
+			"value": "adfLathasribatch37"
+		},
+		"AzureDataLakeStorage1_accountKey": {
+			"value": ""
+		},
+		"ls_azureblob_connectionString": {
+			"value": ""
+		},
+		"ls_localfilesystem_onprem_password": {
+			"value": ""
+		},
+		"ls_onprem_oracle_connectionString": {
+			"value": ""
+		},
+		"AzureDataLakeStorage1_properties_typeProperties_url": {
+			"value": "https://batch37adlsgen2.dfs.core.windows.net/"
+		},
+		"ls_AzureKeyvault_properties_typeProperties_baseUrl": {
+			"value": "https://storepass.vault.azure.net/"
+		},
+		"ls_localfilesystem_onprem_properties_typeProperties_host": {
+			"value": "C:\\files"
+		},
+		"ls_localfilesystem_onprem_properties_typeProperties_userId": {
+			"value": "Latha"
+		},
+		"trigger1_properties_typeProperties_scope": {
+			"value": "/subscriptions/dc159867-cc17-421a-8fcc-a0a5116e52be/resourceGroups/Training/providers/Microsoft.Storage/storageAccounts/batch37adlsgen2"
+		}
+	}
+}
