@@ -17,7 +17,8 @@
 			"ignoreEmptyBlobs": true,
 			"scope": "/subscriptions/dc159867-cc17-421a-8fcc-a0a5116e52be/resourceGroups/Training/providers/Microsoft.Storage/storageAccounts/batch37adlsgen2",
 			"events": [
-				"Microsoft.Storage.BlobCreated"
+				"Microsoft.Storage.BlobCreated",
+				"Microsoft.Storage.BlobDeleted"
 			]
 		}
 	}
